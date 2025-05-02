@@ -39,7 +39,9 @@ var DefaultTheme = Theme{
 	"TabContainer":        tcell.Style{}.Foreground(tcell.ColorGray).Background(tcell.ColorBlack),
 	"TabContainerFocused": tcell.Style{}.Foreground(tcell.ColorSilver).Background(tcell.ColorBlack),
 	"TextEdit":            tcell.Style{}.Foreground(tcell.ColorSilver).Background(tcell.ColorBlack),
+	"TextEditDefault":     tcell.Style{}.Foreground(tcell.ColorSilver).Background(tcell.ColorBlack),
 	"TextEditSelected":    tcell.Style{}.Foreground(tcell.ColorBlack).Background(tcell.ColorSilver),
+	"TextEditColumn":      tcell.Style{}.Foreground(tcell.ColorBlack).Background(tcell.ColorGray),
 	"Window":              tcell.Style{}.Foreground(tcell.ColorBlack).Background(tcell.ColorDarkGray),
 	"WindowHeader":        tcell.Style{}.Foreground(tcell.ColorBlack).Background(tcell.ColorSilver),
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-	"regexp"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -81,43 +80,43 @@ loop:
 	t.selection = buffer.NewRegion(&t.Buffer)
 
 	// TODO: replace with automatic determination of language via filetype
-	lang := &buffer.Language{
-		Name:      "Go",
-		Filetypes: []string{".go"},
-		Rules: map[*buffer.RegexpRegion]buffer.Syntax{
-			{Start: regexp.MustCompile(`\/\/.*`)}: buffer.Comment,
-			{Start: regexp.MustCompile(`".*?"`)}:  buffer.String,
-			{
-				Start: regexp.MustCompile(`\b(var|const|if|else|range|for|switch|fallthrough|case|default|break|continue|go|func|return|defer|import|type|package)\b`),
-			}: buffer.Keyword,
-			{
-				Start: regexp.MustCompile(`\b(u?int(8|16|32|64)?|rune|byte|string|bool|struct)\b`),
-			}: buffer.Type,
-			{
-				Start: regexp.MustCompile(`\b([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+|0[Bb][01]+)\b`),
-			}: buffer.Number,
-			{
-				Start: regexp.MustCompile(`\b(len|cap|panic|make|copy|append)\b`),
-			}: buffer.Builtin,
-			{
-				Start: regexp.MustCompile(`\b(nil|true|false)\b`),
-			}: buffer.Special,
-		},
-	}
+	//lang := &buffer.Language{
+	//	Name:      "Go",
+	//	Filetypes: []string{".go"},
+	//	Rules: map[*buffer.RegexpRegion]buffer.Syntax{
+	//		{Start: regexp.MustCompile(`\/\/.*`)}: buffer.Comment,
+	//		{Start: regexp.MustCompile(`".*?"`)}:  buffer.String,
+	//		{
+	//			Start: regexp.MustCompile(`\b(var|const|if|else|range|for|switch|fallthrough|case|default|break|continue|go|func|return|defer|import|type|package)\b`),
+	//		}: buffer.Keyword,
+	//		{
+	//			Start: regexp.MustCompile(`\b(u?int(8|16|32|64)?|rune|byte|string|bool|struct)\b`),
+	//		}: buffer.Type,
+	//		{
+	//			Start: regexp.MustCompile(`\b([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+|0[Bb][01]+)\b`),
+	//		}: buffer.Number,
+	//		{
+	//			Start: regexp.MustCompile(`\b(len|cap|panic|make|copy|append)\b`),
+	//		}: buffer.Builtin,
+	//		{
+	//			Start: regexp.MustCompile(`\b(nil|true|false)\b`),
+	//		}: buffer.Special,
+	//	},
+	//}
 
-	colorscheme := &buffer.Colorscheme{
-		buffer.Default: tcell.Style{}.Foreground(tcell.ColorLightGray).Background(tcell.ColorBlack),
-		buffer.Column:  tcell.Style{}.Foreground(tcell.ColorDarkGray).Background(tcell.ColorBlack),
-		buffer.Comment: tcell.Style{}.Foreground(tcell.ColorGray).Background(tcell.ColorBlack),
-		buffer.String:  tcell.Style{}.Foreground(tcell.ColorOlive).Background(tcell.ColorBlack),
-		buffer.Keyword: tcell.Style{}.Foreground(tcell.ColorNavy).Background(tcell.ColorBlack),
-		buffer.Type:    tcell.Style{}.Foreground(tcell.ColorPurple).Background(tcell.ColorBlack),
-		buffer.Number:  tcell.Style{}.Foreground(tcell.ColorFuchsia).Background(tcell.ColorBlack),
-		buffer.Builtin: tcell.Style{}.Foreground(tcell.ColorBlue).Background(tcell.ColorBlack),
-		buffer.Special: tcell.Style{}.Foreground(tcell.ColorFuchsia).Background(tcell.ColorBlack),
-	}
+	//colorscheme := &buffer.Colorscheme{
+	//	buffer.Default: tcell.Style{}.Foreground(tcell.ColorLightGray).Background(tcell.ColorBlack),
+	//	buffer.Column:  tcell.Style{}.Foreground(tcell.ColorDarkGray).Background(tcell.ColorBlack),
+	//	buffer.Comment: tcell.Style{}.Foreground(tcell.ColorGray).Background(tcell.ColorBlack),
+	//	buffer.String:  tcell.Style{}.Foreground(tcell.ColorOlive).Background(tcell.ColorBlack),
+	//	buffer.Keyword: tcell.Style{}.Foreground(tcell.ColorNavy).Background(tcell.ColorBlack),
+	//	buffer.Type:    tcell.Style{}.Foreground(tcell.ColorPurple).Background(tcell.ColorBlack),
+	//	buffer.Number:  tcell.Style{}.Foreground(tcell.ColorFuchsia).Background(tcell.ColorBlack),
+	//	buffer.Builtin: tcell.Style{}.Foreground(tcell.ColorBlue).Background(tcell.ColorBlack),
+	//	buffer.Special: tcell.Style{}.Foreground(tcell.ColorFuchsia).Background(tcell.ColorBlack),
+	//}
 
-	t.Highlighter = buffer.NewHighlighter(t.Buffer, lang, colorscheme)
+	//t.Highlighter = buffer.NewHighlighter(t.Buffer, lang, colorscheme)
 }
 
 // GetLineDelimiter returns "\r\n" for a CRLF buffer, or "\n" for an LF buffer.
@@ -187,10 +186,12 @@ func (t *TextEdit) Delete(forwards bool) {
 	t.ScrollToCursor()
 	t.updateCursorVisibility()
 
-	if deletedLine {
-		t.Highlighter.InvalidateLines(startingLine, t.Buffer.Lines()-1)
-	} else {
-		t.Highlighter.InvalidateLines(startingLine, startingLine)
+	if t.Highlighter != nil {
+		if deletedLine {
+			t.Highlighter.InvalidateLines(startingLine, t.Buffer.Lines()-1)
+		} else {
+			t.Highlighter.InvalidateLines(startingLine, startingLine)
+		}
 	}
 }
 
@@ -241,10 +242,12 @@ func (t *TextEdit) Insert(contents string) {
 	t.ScrollToCursor()
 	t.updateCursorVisibility()
 
-	if lineInserted {
-		t.Highlighter.InvalidateLines(startingLine, t.Buffer.Lines()-1)
-	} else {
-		t.Highlighter.InvalidateLines(startingLine, startingLine)
+	if t.Highlighter != nil {
+		if lineInserted {
+			t.Highlighter.InvalidateLines(startingLine, t.Buffer.Lines()-1)
+		} else {
+			t.Highlighter.InvalidateLines(startingLine, startingLine)
+		}
 	}
 }
 
@@ -334,9 +337,17 @@ func (t *TextEdit) Draw(s tcell.Screen) {
 	bufferLines := t.Buffer.Lines()
 
 	selectedStyle := t.theme.GetOrDefault("TextEditSelected")
-	columnStyle := t.Highlighter.Colorscheme.GetStyle(buffer.Column)
+	
+	var columnStyle, defaultStyle tcell.Style
+	if t.Highlighter != nil {
+		defaultStyle = t.Highlighter.Colorscheme.GetStyle(buffer.Default)
+		columnStyle = t.Highlighter.Colorscheme.GetStyle(buffer.Column)		
 
-	t.Highlighter.UpdateInvalidatedLines(t.scrolly, t.scrolly+(t.height-1))
+		t.Highlighter.UpdateInvalidatedLines(t.scrolly, t.scrolly+(t.height-1))
+	} else {
+		defaultStyle = t.theme.GetOrDefault("TextEditDefault")
+		columnStyle = t.theme.GetOrDefault("TextEditColumn")
+	}
 
 	var tabBytes []byte
 	if t.UseHardTabs {
@@ -344,7 +355,6 @@ func (t *TextEdit) Draw(s tcell.Screen) {
 		tabBytes = bytes.Repeat([]byte{' '}, t.TabSize)
 	}
 
-	defaultStyle := t.Highlighter.Colorscheme.GetStyle(buffer.Default)
 	currentStyle := defaultStyle
 
 	for lineY := t.y; lineY < t.y+t.height; lineY++ { // For each line we can draw...
@@ -362,7 +372,10 @@ func (t *TextEdit) Draw(s tcell.Screen) {
 				lineBytes = bytes.ReplaceAll(lineBytes, []byte{'\t'}, tabBytes)
 			}
 
-			lineHighlightData := t.Highlighter.GetLineMatches(line)
+			var lineHighlightData []buffer.Match
+			if t.Highlighter != nil {
+				lineHighlightData = t.Highlighter.GetLineMatches(line)
+			}
 			var lineHighlightDataIdx int
 
 			var byteIdx int          // Byte index of lineStr
