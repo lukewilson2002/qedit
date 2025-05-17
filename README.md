@@ -1,3 +1,8 @@
+<div style="color: beige; border: 1px solid maroon; color: red; width: fit-content;">
+  This repository is now an archive.<br>
+  The repository has moved to my self-hosted Gitea instance at https://git.frop.prof/luke/qedit
+</div>
+
 # qedit
 
 qedit is a simple and easy to maintain editor, designed to run portably on as many
